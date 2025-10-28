@@ -1,65 +1,187 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import CommandCard, { CommandItem } from "@/components/CommandCard";
 import Image from "next/image";
 
+type SupportedOs = "Windows" | "macOS" | "Linux" | "Unknown";
+
+function detectOs(userAgent: string): SupportedOs {
+  const ua = userAgent.toLowerCase();
+  if (ua.includes("windows nt") || ua.includes("win64") || ua.includes("win32")) return "Windows";
+  if (ua.includes("mac os x") || ua.includes("macintosh")) return "macOS";
+  if (ua.includes("linux") || ua.includes("x11")) return "Linux";
+  return "Unknown";
+}
+
 export default function Home() {
+  const [autoDetectedOs, setAutoDetectedOs] = useState<SupportedOs>("Unknown");
+  const [selectedOs, setSelectedOs] = useState<SupportedOs | "Auto">("Auto");
+
+  useEffect(() => {
+    if (typeof navigator !== "undefined") {
+      const os = detectOs(navigator.userAgent || "");
+      setAutoDetectedOs(os);
+    }
+  }, []);
+
+  const effectiveOs: SupportedOs = useMemo(() => {
+    if (selectedOs === "Auto") return autoDetectedOs;
+    return selectedOs;
+  }, [selectedOs, autoDetectedOs]);
+
+  const commandMap: Record<Exclude<SupportedOs, "Unknown">, CommandItem[]> = {
+    Windows: [
+      {
+        description: "Check processor architecture",
+        command: "wmic cpu get architecture",
+      },
+      {
+        description: "Download CLI (replace placeholders)",
+        command:
+          'Start-Process "https://prime.tmdata.io/plutus/api/v1/files/download?name=dataos-ctl-windows-{{ARCH}}.tar.gz&dir=cli-apps-{{CLI_VERSION}}&apikey={{PRIME_APIKEY}}"',
+      },
+      {
+        description: "(Optional) Download checksum",
+        command:
+          'Start-Process "https://prime.tmdata.io/plutus/api/v1/files/download?name=dataos-ctl-windows-{{ARCH}}.tar.gz.sha256sum&dir=cli-apps-{{CLI_VERSION}}&apikey={{PRIME_APIKEY}}"',
+      },
+      {
+        description: "(Optional) Verify file integrity",
+        command:
+          "(Get-FileHash -Algorithm SHA256 -Path {{tar-file-path}}).hash -eq '{{hash-value-from-shasum-file}}'",
+      },
+    ],
+    Linux: [
+      {
+        description: "Set API key",
+        command: 'export PRIME_APIKEY="{{prime_apikey}}"',
+      },
+      {
+        description: "Check processor architecture",
+        command: "uname -p",
+      },
+      {
+        description: "Download CLI binary",
+        command:
+          "curl --silent --output dataos-ctl-linux-{{ARCH}}.tar.gz \\\n--location --request GET \\\n\"https://prime.tmdata.io/plutus/api/v1/files/download?name=dataos-ctl-linux-{{ARCH}}.tar.gz&dir=cli-apps-{{CLI_VERSION}}&apikey=$PRIME_APIKEY\"",
+      },
+      {
+        description: "(Optional) Download checksum",
+        command:
+          "curl --silent --output dataos-ctl-linux-{{ARCH}}.tar.gz.sha256sum \\\n--location --request GET \\\n\"https://prime.tmdata.io/plutus/api/v1/files/download?name=dataos-ctl-linux-{{ARCH}}.tar.gz.sha256sum&dir=cli-apps-{{CLI_VERSION}}&apikey=$PRIME_APIKEY\"",
+      },
+      {
+        description: "(Optional) Verify checksum",
+        command: "shasum -a 256 -c dataos-ctl-linux-{{ARCH}}.tar.gz.sha256sum",
+      },
+      {
+        description: "Extract the archive",
+        command: "tar -xvf dataos-ctl-linux-{{ARCH}}.tar.gz",
+      },
+      {
+        description: "Add binary to PATH",
+        command: "export PATH=$PATH:$HOME/linux-{{ARCH}}",
+      },
+      {
+        description: "Persist PATH (Bash example)",
+        command:
+          "echo 'export PATH=$PATH:$HOME/.dataos/bin' >> ~/.bash_profile\nsource ~/.bash_profile",
+      },
+    ],
+    macOS: [
+      {
+        description: "Set API key",
+        command: 'export PRIME_APIKEY="{{prime_apikey}}"',
+      },
+      {
+        description: "Check processor architecture",
+        command: "uname -m",
+      },
+      {
+        description: "Download CLI binary",
+        command:
+          "curl --silent --output dataos-ctl-{{ARCH}}.tar.gz \\\n--location --request GET \\\n\"https://prime.tmdata.io/plutus/api/v1/files/download?name=dataos-ctl-{{ARCH}}.tar.gz&dir=cli-apps-{{CLI_VERSION}}&apikey=$PRIME_APIKEY\"",
+      },
+      {
+        description: "(Optional) Download checksum file",
+        command:
+          "curl --silent --output dataos-ctl-{{ARCH}}.tar.gz.sha256sum \\\n--location --request GET \\\n\"https://prime.tmdata.io/plutus/api/v1/files/download?name=dataos-ctl-{{ARCH}}.tar.gz.sha256sum&dir=cli-apps-{{CLI_VERSION}}&apikey=$PRIME_APIKEY\"",
+      },
+      {
+        description: "(Optional) Verify checksum",
+        command: "shasum -a 256 -c dataos-ctl-{{ARCH}}.tar.gz.sha256sum",
+      },
+      {
+        description: "Extract the archive",
+        command: "tar -xvf dataos-ctl-{{ARCH}}.tar.gz",
+      },
+      {
+        description: "Add binary to PATH",
+        command: "export PATH=$PATH:$HOME/{{dir-name}}",
+      },
+      {
+        description: "Persist PATH (Zsh example)",
+        command:
+          "echo 'export PATH=$PATH:$HOME/.dataos/bin' >> ~/.zshrc\nsource ~/.zshrc",
+      },
+    ],
+  };
+
+  const commands: CommandItem[] = effectiveOs === "Unknown" ? [] : commandMap[effectiveOs];
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="min-h-screen bg-gradient-to-b from-zinc-50 via-white to-white text-zinc-900 flex flex-col items-center px-4 py-16">
+      <div className="w-full max-w-4xl">
+        <div className="flex flex-col items-center text-center mb-8">
+        
+          <div className="mb-4">
+            <Image
+              src="/modernLogo.png"  
+              alt="Modern Logo"
+              width={200}
+              height={200}
+              className="invert "
+              priority
+            />
+          </div>
+          <h1 className="text-4xl font-bold ">OS Command Helper</h1>
+          <p className="mt-2 text-zinc-600 max-w-xl text-sm">
+            Automatically detects your operating system and shows the right terminal commands <br />
+            If not, select your operating system from the dropdown and copy the commands to your clipboard.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        <div className="mb-6 flex items-center justify-center gap-3">
+          <label className="text-sm text-zinc-700">Operating System</label>
+          <select
+            value={selectedOs}
+            onChange={(e) => setSelectedOs(e.target.value as SupportedOs | "Auto")}
+            className="rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm text-zinc-900 shadow-sm outline-none focus:border-cyan-500"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <option value="Auto">Auto ({autoDetectedOs})</option>
+            <option value="Windows">🪟 Windows</option>
+            <option value="macOS"> macOS</option>
+            <option value="Linux">🐧 Linux</option>
+          </select>
         </div>
-      </main>
+
+        {effectiveOs === "Unknown" ? (
+          <div className="mx-auto w-full max-w-2xl rounded-xl border border-zinc-200 bg-white p-6 text-center text-zinc-600 shadow-sm">
+            Your OS could not be detected.
+          </div>
+        ) : (
+          <div className="mx-auto w-full max-w-3xl">
+            <h2 className="mb-3 text-lg font-semibold text-zinc-900">
+              {effectiveOs} Commands
+            </h2>
+            <CommandCard osName={effectiveOs} commands={commands} />
+            <p className="mt-6 text-center text-sm text-zinc-600">
+              Press the copy button to quickly copy commands to your clipboard
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
