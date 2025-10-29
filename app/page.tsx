@@ -54,12 +54,12 @@ export default function Home() {
       {
         description: "Download CLI binary",
         command:
-          "curl --silent --output dataos-ctl-linux-{{ARCH}}.tar.gz \\\n--location --request GET \\\n\"https://prime.tmdata.io/plutus/api/v1/files/download?name=dataos-ctl-linux-{{ARCH}}.tar.gz&dir=cli-apps-{{CLI_VERSION}}&apikey=$PRIME_APIKEY\"",
+          "curl --silent --output dataos-ctl-linux-{{ARCH}}.tar.gz \\\n--location --request GET \\\n\"https://prime.tmdata.io/plutus/api/v1/files/download?name=dataos-ctl-linux-{{ARCH}}.tar.gz&dir=cli-apps-2.26&apikey=$PRIME_APIKEY\"",
       },
       {
         description: "(Optional) Download checksum",
         command:
-          "curl --silent --output dataos-ctl-linux-{{ARCH}}.tar.gz.sha256sum \\\n--location --request GET \\\n\"https://prime.tmdata.io/plutus/api/v1/files/download?name=dataos-ctl-linux-{{ARCH}}.tar.gz.sha256sum&dir=cli-apps-{{CLI_VERSION}}&apikey=$PRIME_APIKEY\"",
+          "curl --silent --output dataos-ctl-linux-{{ARCH}}.tar.gz.sha256sum \\\n--location --request GET \\\n\"https://prime.tmdata.io/plutus/api/v1/files/download?name=dataos-ctl-linux-{{ARCH}}.tar.gz.sha256sum&dir=cli-apps-2.26&apikey=$PRIME_APIKEY\"",
       },
       {
         description: "(Optional) Verify checksum",
@@ -85,18 +85,14 @@ export default function Home() {
         command: 'export PRIME_APIKEY="{{prime_apikey}}"',
       },
       {
-        description: "Check processor architecture",
-        command: "uname -m",
-      },
-      {
         description: "Download CLI binary",
         command:
-          "curl --silent --output dataos-ctl-{{ARCH}}.tar.gz \\\n--location --request GET \\\n\"https://prime.tmdata.io/plutus/api/v1/files/download?name=dataos-ctl-{{ARCH}}.tar.gz&dir=cli-apps-{{CLI_VERSION}}&apikey=$PRIME_APIKEY\"",
+          "curl --silent --output dataos-ctl-{{ARCH}}.tar.gz \\\n--location --request GET \\\n\"https://prime.tmdata.io/plutus/api/v1/files/download?name=dataos-ctl-{{ARCH}}.tar.gz&dir=cli-apps-2.26&apikey=$PRIME_APIKEY\"",
       },
       {
         description: "(Optional) Download checksum file",
         command:
-          "curl --silent --output dataos-ctl-{{ARCH}}.tar.gz.sha256sum \\\n--location --request GET \\\n\"https://prime.tmdata.io/plutus/api/v1/files/download?name=dataos-ctl-{{ARCH}}.tar.gz.sha256sum&dir=cli-apps-{{CLI_VERSION}}&apikey=$PRIME_APIKEY\"",
+          "curl --silent --output dataos-ctl-{{ARCH}}.tar.gz.sha256sum \\\n--location --request GET \\\n\"https://prime.tmdata.io/plutus/api/v1/files/download?name=dataos-ctl-{{ARCH}}.tar.gz.sha256sum&dir=cli-apps-2.26&apikey=$PRIME_APIKEY\"",
       },
       {
         description: "(Optional) Verify checksum",
