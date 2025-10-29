@@ -41,16 +41,6 @@ export default function Home() {
         command:
           'Start-Process "https://prime.tmdata.io/plutus/api/v1/files/download?name=dataos-ctl-windows-{{ARCH}}.tar.gz&dir=cli-apps-{{CLI_VERSION}}&apikey={{PRIME_APIKEY}}"',
       },
-      {
-        description: "(Optional) Download checksum",
-        command:
-          'Start-Process "https://prime.tmdata.io/plutus/api/v1/files/download?name=dataos-ctl-windows-{{ARCH}}.tar.gz.sha256sum&dir=cli-apps-{{CLI_VERSION}}&apikey={{PRIME_APIKEY}}"',
-      },
-      {
-        description: "(Optional) Verify file integrity",
-        command:
-          "(Get-FileHash -Algorithm SHA256 -Path {{tar-file-path}}).hash -eq '{{hash-value-from-shasum-file}}'",
-      },
     ],
     Linux: [
       {
