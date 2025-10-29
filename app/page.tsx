@@ -128,27 +128,42 @@ export default function Home() {
     ],
   };
 
-  const commands: CommandItem[] = effectiveOs === "Unknown" ? [] : commandMap[effectiveOs];
+  // Replace {{ARCH}} dynamically based on OS
+  const commands: CommandItem[] =
+    effectiveOs === "Unknown"
+      ? []
+      : commandMap[effectiveOs].map((cmd) => {
+          let arch = "";
+          if (effectiveOs === "macOS") arch = "darwin-amd64";
+          else if (effectiveOs === "Windows") arch = "amd64";
+          else if (effectiveOs === "Linux") arch = "amd64";
+
+          return {
+            ...cmd,
+            command: cmd.command.replace(/{{ARCH}}/g, arch),
+          };
+        });
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-50 via-white to-white text-zinc-900 flex flex-col items-center px-4 py-16">
       <div className="w-full max-w-4xl">
         <div className="flex flex-col items-center text-center mb-8">
-        
           <div className="mb-4">
             <Image
-              src="/modernLogo.png"  
+              src="/modernLogo.png"
               alt="Modern Logo"
               width={200}
               height={200}
-              className="invert "
+              className="invert"
               priority
             />
           </div>
-          <h1 className="text-4xl font-bold ">OS Command Helper</h1>
+          <h1 className="text-4xl font-bold">OS Command Helper</h1>
           <p className="mt-2 text-zinc-600 max-w-xl text-sm">
-            Automatically detects your operating system and shows the right terminal commands <br />
-            If not, select your operating system from the dropdown and copy the commands to your clipboard.
+            Automatically detects your operating system and replaces architecture placeholders
+            accordingly.
+            <br />
+            If detection fails, select your OS manually and copy the commands.
           </p>
         </div>
 
@@ -172,12 +187,10 @@ export default function Home() {
           </div>
         ) : (
           <div className="mx-auto w-full max-w-3xl">
-            <h2 className="mb-3 text-lg font-semibold text-zinc-900">
-              {effectiveOs} Commands
-            </h2>
+            <h2 className="mb-3 text-lg font-semibold text-zinc-900">{effectiveOs} Commands</h2>
             <CommandCard osName={effectiveOs} commands={commands} />
             <p className="mt-6 text-center text-sm text-zinc-600">
-              Press the copy button to quickly copy commands to your clipboard
+              Press the copy button to quickly copy commands to your clipboard.
             </p>
           </div>
         )}
