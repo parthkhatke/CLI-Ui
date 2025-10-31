@@ -57,15 +57,6 @@ export default function Home() {
           "curl --silent --output dataos-ctl-linux-{{ARCH}}.tar.gz \\\n--location --request GET \\\n\"https://prime.tmdata.io/plutus/api/v1/files/download?name=dataos-ctl-linux-{{ARCH}}.tar.gz&dir=cli-apps-2.26&apikey=$PRIME_APIKEY\"",
       },
       {
-        description: "(Optional) Download checksum",
-        command:
-          "curl --silent --output dataos-ctl-linux-{{ARCH}}.tar.gz.sha256sum \\\n--location --request GET \\\n\"https://prime.tmdata.io/plutus/api/v1/files/download?name=dataos-ctl-linux-{{ARCH}}.tar.gz.sha256sum&dir=cli-apps-2.26&apikey=$PRIME_APIKEY\"",
-      },
-      {
-        description: "(Optional) Verify checksum",
-        command: "shasum -a 256 -c dataos-ctl-linux-{{ARCH}}.tar.gz.sha256sum",
-      },
-      {
         description: "Extract the archive",
         command: "tar -xvf dataos-ctl-linux-{{ARCH}}.tar.gz",
       },
@@ -88,15 +79,6 @@ export default function Home() {
         description: "Download CLI binary",
         command:
           "curl --silent --output dataos-ctl-{{ARCH}}.tar.gz \\\n--location --request GET \\\n\"https://prime.tmdata.io/plutus/api/v1/files/download?name=dataos-ctl-{{ARCH}}.tar.gz&dir=cli-apps-2.26&apikey=$PRIME_APIKEY\"",
-      },
-      {
-        description: "(Optional) Download checksum file",
-        command:
-          "curl --silent --output dataos-ctl-{{ARCH}}.tar.gz.sha256sum \\\n--location --request GET \\\n\"https://prime.tmdata.io/plutus/api/v1/files/download?name=dataos-ctl-{{ARCH}}.tar.gz.sha256sum&dir=cli-apps-2.26&apikey=$PRIME_APIKEY\"",
-      },
-      {
-        description: "(Optional) Verify checksum",
-        command: "shasum -a 256 -c dataos-ctl-{{ARCH}}.tar.gz.sha256sum",
       },
       {
         description: "Extract the archive",
@@ -144,7 +126,7 @@ export default function Home() {
               priority
             />
           </div>
-          <h1 className="text-4xl font-bold">OS Command Helper</h1>
+          <h1 className="text-4xl font-bold">DATA OS installation Command Helper</h1>
           <p className="mt-2 text-zinc-600 max-w-xl text-sm">
             Automatically detects your operating system and replaces architecture placeholders
             accordingly.
