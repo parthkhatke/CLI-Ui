@@ -19,7 +19,6 @@ export default function CommandCard({ osName, commands }: CommandCardProps) {
     try {
       await navigator.clipboard.writeText(command);
       setCopiedIndex(index);
-      setTimeout(() => setCopiedIndex(null), 1500);
     } catch {}
   }
 
