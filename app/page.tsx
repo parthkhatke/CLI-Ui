@@ -88,19 +88,6 @@ export default function Home() {
     ],
   };
 
-    const [requested, setRequested] = useState(false);
-
-  const handleClick = () => {
-    const recipient = "kishan.mahajan@tmdc.io";
-    const subject = "API key required";
-    const body = "I need the Prime API Key to download DataOS CLI.";
-
-    // Open mail client
-    window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-    // Change button text
-    setRequested(true);
-  };
 
   // Replace {{ARCH}} dynamically based on OS
   const commands: CommandItem[] =
@@ -153,10 +140,6 @@ export default function Home() {
             <option value="macOS"> macOS</option>
             <option value="Linux">🐧 Linux</option>
           </select>
-          <button className="h-fit whitespace-nowrap rounded-md bg-zinc-900 px-3 py-2 text-xs font-medium text-white transition hover:bg-zinc-800 active:bg-zinc-700"
-            onClick= {handleClick}>
-            {requested ? "Requested!" : "Request API Key"}
-          </button>
         </div>
 
         {effectiveOs === "Unknown" ? (
