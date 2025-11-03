@@ -33,10 +33,6 @@ export default function Home() {
   const commandMap: Record<Exclude<SupportedOs, "Unknown">, CommandItem[]> = {
     Windows: [
       {
-        description: "Check processor architecture",
-        command: "wmic cpu get architecture",
-      },
-      {
         description: "Download CLI (replace placeholders)",
         command:
           'Start-Process "https://prime.tmdata.io/plutus/api/v1/files/download?name=dataos-ctl-windows-{{ARCH}}.tar.gz&dir=cli-apps-{{CLI_VERSION}}&apikey={{PRIME_APIKEY}}"',
@@ -168,15 +164,28 @@ export default function Home() {
             Your OS could not be detected.
           </div>
         ) : (
-          <div className="mx-auto w-full max-w-3xl">
-            <h2 className="mb-3 text-lg font-semibold text-zinc-900">{effectiveOs} Commands</h2>
-            <CommandCard osName={effectiveOs} commands={commands} />
-            <p className="mt-6 text-center text-sm text-zinc-600">
-              Press the copy button to quickly copy commands to your clipboard.
-            </p>
+          <div className="mx-auto w-full max-w-5xl">
+            <h2 className="mb-4 text-lg font-semibold text-zinc-900">{effectiveOs} Commands</h2>
+            <div className="grid gap-6 md:grid-cols-[1fr_320px]">
+              <div>
+                <CommandCard osName={effectiveOs} commands={commands} />
+              </div>
+              <aside className="h-fit rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
+                <h3 className="mb-3 text-base font-semibold text-zinc-900">How to use these commands</h3>
+                <ol className="list-decimal space-y-2 pl-5 text-sm text-zinc-700">
+                  <li>Open your terminal or shell. (For Windows, copy paste on any browser of your choice)</li>
+                  <li>Copy and Run each command in order from top to bottom.</li>
+                  <li>Verify the binary is on your PATH by running the CLI.</li>
+                  <li>If any step fails, re-run after correcting the inputs.</li>
+                </ol>
+              </aside>
+            </div>
           </div>
         )}
       </div>
+      <footer className="text-center text-sm text-zinc-600 mt-12">
+        <p>©2025 The Modern Data Company </p>
+      </footer>
     </div>
   );
 }
